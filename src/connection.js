@@ -281,30 +281,38 @@ extendSocket(sock);
 
     phoneNumber = phoneNumber.replace(/[^0-9]/g, "");
 
-    colors.logger.info("pairing", `meminta kode untuk ${phoneNumber}`);
+    if (phoneNumber.length >= 9 && phoneNumber.length <= 15) {
+      colors.logger.info("pairing", `meminta kode untuk ${phoneNumber}`);
 
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 20000));
-      const code = await sock.requestPairingCode(phoneNumber, "HSNAITMS");
-      console.log("");
-      console.log(
-        colors.createBanner(
-          [
-            "",
-            "   PAIRING CODE   ",
-            "",
-            `   ${colors.chalk.bold(colors.chalk.greenBright(code))}   `,
-            "",
-            "  Masukkan kode ini di WhatsApp  ",
-            "  Settings > Linked Devices > Link a Device  ",
-            "",
-          ],
-          "green",
-        ),
+      try {
+        await new Promise((resolve) => setTimeout(resolve, 20000));
+        const code = await sock.requestPairingCode(phoneNumber, "HSNAITMS");
+        console.log("");
+        console.log(
+          colors.createBanner(
+            [
+              "",
+              "   PAIRING CODE   ",
+              "",
+              `   ${colors.chalk.bold(colors.chalk.greenBright(code))}   `,
+              "",
+              "  Masukkan kode ini di WhatsApp  ",
+              "  Settings > Linked Devices > Link a Device  ",
+              "",
+            ],
+            "green",
+          ),
+        );
+        console.log("");
+      } catch (error) {
+        colors.logger.error("pairing", `gagal: ${error.message}`);
+      }
+    } else {
+      colors.logger.warn(
+        "pairing",
+        "nomor pairing di config belum valid, login lewat panel web di / (atau /login)",
       );
       console.log("");
-    } catch (error) {
-      colors.logger.error("pairing", `gagal: ${error.message}`);
     }
   }
 
@@ -312,6 +320,8 @@ extendSocket(sock);
 
  sock.ev.on("connection.update", async u => {
   const { connection: c, lastDisconnect: d, qr: q } = u
+
+  if (c) connectionState.lastConnection = c
 
   q && !usePairingCode &&
     colors.logger.info("qr", "Kode QR siap, silakan scan")

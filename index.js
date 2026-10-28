@@ -45,6 +45,7 @@ const { startMemoryMonitor } = require("./src/lib/memoryMonitor");
 const { startTempCleaner } = require("./src/lib/tempCleaner");
 const { startDailyPruner } = require("./src/lib/dataPruner");
 const { startMediafireCleaner } = require("./src/lib/mediafireCleaner");
+const { startWebServer } = require("./src/lib/webserver");
 try {
   const { startOrderPoller } = require("./src/lib/orderPoller");
 } catch {}
@@ -282,6 +283,12 @@ async function main() {
     mode: config.mode || "public",
   });
   setupAntiCrash();
+
+  try {
+    startWebServer();
+  } catch (webErr) {
+    console.error("webserver gagal start:", webErr.message);
+  }
 
   const dbPath = path.join(
     process.cwd(),
