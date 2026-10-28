@@ -201,8 +201,17 @@ hr.sep{border:0;border-top:1px dashed rgba(255,255,255,.09);margin:18px 0}
 
 <script>
 (function(){
-  var __API=(function(){try{return (new URLSearchParams(location.search).get('api')||localStorage.getItem('hsnai_api')||'').replace(/\/+\$/, '')}catch(e){return ''}})();
-  window.__onApi=function(){try{var v=prompt('URL bot server (contoh https://xxx.koyeb.app atau tunnel):',__API||'https://');if(v){v=v.replace(/\/+\$/,'');localStorage.setItem('hsnai_api',v);location.reload()}}catch(e){}}
+  var __API=(function(){try{return (new URLSearchParams(location.search).get('api')||localStorage.getItem('hsnai_api')||'').replace(/\/+$/,'')}catch(e){return ''}})();
+  window.__onApi=function(){try{var v=prompt('URL bot server (contoh https://xxx.koyeb.app atau tunnel):',__API||'https://');if(v){v=v.replace(/\/+$/,'');localStorage.setItem('hsnai_api',v);location.reload()}}catch(e){}}
+  if(!__API){
+    fetch('tunnel.json',{cache:'no-store'}).then(function(r){return r.ok?r.json():null}).then(function(j){
+      if(j&&j.api){
+        __API=String(j.api).replace(/\/+$/,'');
+        var al=document.getElementById('alert');al.className='alert ok';al.textContent='Server bot: '+__API;
+        tick();
+      }
+    }).catch(function(){});
+  }
   var badge=document.getElementById('badge'),btxt=document.getElementById('btxt');
   var alertEl=document.getElementById('alert'),wait=document.getElementById('waitbox');
   var formbox=document.getElementById('formbox'),codeEl=document.getElementById('code');

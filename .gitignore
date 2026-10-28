@@ -34,3 +34,6 @@ ind.traineddata
 # clone lokal pemakai (jangan ikut repo)
 SelfWa/
 Yorn/
+
+# token HF lokal (JANGAN commit)
+.hf_token
