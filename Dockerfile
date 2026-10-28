@@ -1,41 +1,32 @@
-# Gunakan Node.js 22 di atas OS Linux Debian yang paling stabil (bookworm)
-# Sangat disarankan untuk mempermudah pemasangan Sharp dan Canvas tanpa kompilasi manual yang abrok
+# Node 22 di Debian bookworm. Diminimalkan agar image < 1 GiB terkompresi
+# (limit upload image pada tier free Koyeb).
 FROM node:22-bookworm
 
 ENV NODE_ENV=development
 ENV TZ=Asia/Jakarta
 ENV PORT=8000
+ENV PUPPETEER_SKIP_DOWNLOAD=1
 
 WORKDIR /app
 
-# Update package manager dan instal dependencies fundamental OS:
-# - ffmpeg (Untuk bikin stiker video/audio)
-# - libvips-dev (Dukungan penuh untuk library sharp jika butuh recompile)
-# - build-essential (Untuk modul native C++ jika ada)
+# Runtime saja: ffmpeg (media), git (persist via GIT_SYNC_URL), tzdata.
+# TIDAKADA: build-essential/libvips-dev (semua modul native pakai prebuild x64),
+#           python3/pip (backend HF dataset opsional; backend GIT cukup git).
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-    ffmpeg \
-    libvips-dev \
-    build-essential \
-    python3 \
-    python3-pip \
-    git \
-    tzdata && \
+    apt-get install -y --no-install-recommends ffmpeg git tzdata ca-certificates && \
     ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
 COPY package.json .npmrc ./
 
-# legacy-peer-deps terbaca dari .npmrc yang ikut ter-copy, biarkan resolve peer bebas
-RUN npm install --no-audit --no-fund
-
-# CLI huggingface (`hf`): restore + backup objek sesi untuk Space ephemeral
-RUN (python3 -m pip install --break-system-packages huggingface_hub || \
-     python3 -m pip install huggingface_hub) || echo "pip skip - persistensi HF tetap jalan lewat GIT_SYNC_URL"
+# legacy-peer-deps dibaca dari .npmrc; only produk, cache dibuang
+RUN npm install --omit=dev --no-audit --no-fund && \
+    npm prune --omit=dev && \
+    npm cache clean --force && \
+    rm -rf ~/.npm /tmp/* /var/lib/apt/lists/*
 
 COPY . .
 
-RUN chmod -R 777 /app
+RUN chmod -R 777 /app || true
 
 CMD ["npm", "start"]
