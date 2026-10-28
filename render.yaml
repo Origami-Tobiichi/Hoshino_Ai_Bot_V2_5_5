@@ -18,3 +18,5 @@ services:
         sync: false
       - key: YOUTUBE_API_KEY
         sync: false
+      - key: GIT_SYNC_URL
+        sync: false

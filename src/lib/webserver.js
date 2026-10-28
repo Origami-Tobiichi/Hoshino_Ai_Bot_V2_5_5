@@ -1,4 +1,5 @@
 const http = require("http");
+const https = require("https");
 const fs = require("fs");
 const path = require("path");
 const config = require("../../config");
@@ -194,6 +195,20 @@ function startWebServer() {
       `panel web aktif di port ${PORT} (buka / atau /login untuk pairing)`,
     );
   });
+
+  // keepalive: cegah hosting free tidur karena "tidak ada HTTP" (Render dll.)
+  const KEEPALIVE_URL = process.env.RENDER_EXTERNAL_URL || process.env.KEEPALIVE_URL;
+  if (KEEPALIVE_URL) {
+    const mod = KEEPALIVE_URL.startsWith("https") ? https : http;
+    const ms = Number(process.env.KEEPALIVE_MS) || 10 * 60 * 1000;
+    const ping = () =>
+      mod
+        .get(KEEPALIVE_URL.replace(/\/+$/, "") + "/api/status", r => r.resume())
+        .on("error", () => {});
+    setTimeout(ping, 20 * 1000);
+    setInterval(ping, ms);
+    console.log(`[web] keepalive tiap ${ms / 60000} menit -> ${KEEPALIVE_URL}`);
+  }
 
   globalThis.__hsnWebServer = server;
   return server;
