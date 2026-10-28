@@ -20,11 +20,11 @@ RUN apt-get update && \
 
 COPY package.json .npmrc ./
 
-# legacy-peer-deps dibaca dari .npmrc; only produk, cache dibuang
-RUN npm install --omit=dev --no-audit --no-fund && \
-    npm prune --omit=dev && \
+# legacy-peer-deps dibaca dari .npmrc; cache dibuang.
+# tanpa `npm prune`: transitive deps dari paket file:./hsnai ikut terpasang
+RUN npm install --no-audit --no-fund && \
     npm cache clean --force && \
-    rm -rf ~/.npm /tmp/* /var/lib/apt/lists/*
+    rm -rf ~/.npm /tmp/*
 
 COPY . .
 
