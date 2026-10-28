@@ -18,6 +18,7 @@ RUN apt-get update && \
     libvips-dev \
     build-essential \
     python3 \
+    python3-pip \
     git \
     tzdata && \
     ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone && \
@@ -31,8 +32,7 @@ RUN npm install --no-audit --no-fund
 
 # CLI huggingface (`hf`): restore + backup objek sesi untuk Space ephemeral
 RUN (python3 -m pip install --break-system-packages huggingface_hub || \
-     python3 -m pip install huggingface_hub) && \
-    hf version || huggingface-cli version
+     python3 -m pip install huggingface_hub) || echo "pip skip - persistensi HF tetap jalan lewat GIT_SYNC_URL"
 
 COPY . .
 
