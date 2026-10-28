@@ -26,6 +26,10 @@ RUN npm install --no-audit --no-fund && \
     npm cache clean --force && \
     rm -rf ~/.npm /tmp/*
 
+# deps milik package vendored hsnai (requirements crypto/store/cache-manager dll.)
+RUN cd hsnai && npm install --omit=dev --no-audit --no-fund --legacy-peer-deps && \
+    npm cache clean --force && cd ..
+
 COPY . .
 
 RUN chmod -R 777 /app || true
