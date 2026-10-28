@@ -8,15 +8,16 @@ const config = {
 
     owner: {
         name: 'SeaPRST || Died100',                    // Nama owner~ orang spesialnya Ai
-        number: ['62xxxxxxxxx']         // Format: 628xxx (tanpa + atau 0)
+        number: ['6283853214466']         // Format: 628xxx (tanpa + atau 0)
     },
 
     session: {
-        pairingNumber: '62xxxxxxxxx',   // Nomor WA yang akan di-pair sama Ai
+        pairingNumber: '6281717623112',   // Nomor WA yang akan di-pair sama Ai
         usePairingCode: true              // true = Pairing Code, false = QR Code
     },
 
     bot: {
+    number: '6281717623112',          // nomor as bot (628xxx, tanpa + atau 0)
     name: 'Hoshino Ai',
     version: '2.5.5',
     developer: 'SeaPRST || Died100 ✨ (didukung oleh Ai)',
@@ -393,13 +394,13 @@ function isOwner(number) {
 
     if (config.bot?.number && cleanNumber === config.bot.number) return true
 
+    if (config.owner && config.owner.number && config.owner.number.includes(cleanNumber)) {
+        return true
+    }
+
     try {
         const { getDatabase } = require('./src/lib/database')
         const db = getDatabase()
-
-        if (config.owner && config.owner.number && config.owner.number.includes(cleanNumber)) {
-            return true
-        }
 
         if (db && db.data && Array.isArray(db.data.owner)) {
             if (db.data.owner.includes(cleanNumber)) return true
