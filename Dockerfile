@@ -24,9 +24,10 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-COPY package.json ./
+COPY package.json .npmrc ./
 
-RUN npm install
+# legacy-peer-deps terbaca dari .npmrc yang ikut ter-copy, biarkan resolve peer bebas
+RUN npm install --no-audit --no-fund
 
 COPY . .
 
