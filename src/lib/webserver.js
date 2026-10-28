@@ -10,6 +10,14 @@ const {
 } = require("../connection");
 
 const PAIR_KEY = "HSNAITMS";
+
+// izinkan panel statis (HF Space /.*) manggil API ini lintas domain
+const CORS_HEADERS = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type",
+  "Access-Control-Max-Age": "86400",
+};
 const pairRate = new Map();
 
 function humanizeUptime(ms) {
@@ -93,6 +101,12 @@ async function requestPairingCode(number) {
 }
 
 async function handleApi(req, res, pathname) {
+  if (req.method === "OPTIONS") {
+    res.writeHead(204, CORS_HEADERS);
+    res.end();
+    return;
+  }
+
   if (req.method === "GET" && pathname === "/api/status") {
     return sendJson(res, 200, statusPayload());
   }
@@ -139,6 +153,7 @@ async function handleApi(req, res, pathname) {
 function sendJson(res, code, obj) {
   const body = JSON.stringify(obj);
   res.writeHead(code, {
+    ...CORS_HEADERS,
     "Content-Type": "application/json; charset=utf-8",
     "Cache-Control": "no-store",
   });
