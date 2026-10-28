@@ -229,6 +229,11 @@ const sock = makeWASocket({
 store.bind(sock.ev);
 sock.store = store;
 
+// Simpan creds SEJAK AWAL supaya hasil requestPairingCode tersimpan
+// (dulu saveCreds dipasang setelah blok pairing — pairing sesi yang
+// menunggu konfirmasi lalu 401 karena noiseKey lama dianggap hang)
+sock.ev.on("creds.update", saveCreds);
+
 // ===== Hook raw WebSocket buat capture XML node (AdditionalNodes) =====
 if (sock.ws?.on) {
   // Coba semua nama event yang mungkin dipakai hsnai
@@ -316,7 +321,7 @@ extendSocket(sock);
     }
   }
 
-  sock.ev.on("creds.update", saveCreds);
+  // (saveCreds sudah dipasang sejak awal, tepat setelah store bind)
 
  sock.ev.on("connection.update", async u => {
   const { connection: c, lastDisconnect: d, qr: q } = u

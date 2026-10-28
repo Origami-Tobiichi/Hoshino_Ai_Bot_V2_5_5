@@ -15,6 +15,13 @@ pkill -f "node index.js" 2>/dev/null
 pkill -f "cloudflared tunnel" 2>/dev/null
 sleep 2
 
+# sesi lama yang gagal pairing (unauthorized) harus dibuang agar
+# noiseKey yang diblokir server tidak dipakai lagi
+if grep -q "Unauthorized" bot.log 2>/dev/null && ! grep -q "isConnected" bot.log; then
+  echo "  bersihkan storage/session (sesi lama invalid)..."
+  rm -rf storage/session
+fi
+
 echo "[2/3] start bot (proot ubuntu, port $PORT, log: bot.log)..."
 (proot-distro login ubuntu -- bash -lc "export PATH=$NODEBIN:\$PATH; cd /data/data/com.termux/files/home/Hoshino_Ai_Bot_V2_5_5 && PORT=$PORT exec node index.js > bot.log 2>&1" >/dev/null 2>&1 &)
 
