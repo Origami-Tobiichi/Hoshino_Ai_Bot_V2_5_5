@@ -504,4 +504,4 @@ hr.sep{border:0;border-top:1px dashed rgba(255,255,255,.09);margin:18px 0}
 </html>`;
 }
 
-module.exports = { startWebServer };
+module.exports = { startWebServer, renderPage };
