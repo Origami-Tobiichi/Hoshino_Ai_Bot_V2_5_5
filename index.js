@@ -284,6 +284,14 @@ async function main() {
   });
   setupAntiCrash();
 
+  // Restore + autosave sesi jika di-hosting ephemeral (HF Space)
+  try {
+    const persist = require("./scripts/hf-session-sync");
+    persist.start("HF Space");
+  } catch (persistErr) {
+    console.error("[persist] init gagal:", persistErr.message);
+  }
+
   try {
     startWebServer();
   } catch (webErr) {

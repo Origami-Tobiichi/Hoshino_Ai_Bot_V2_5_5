@@ -29,6 +29,11 @@ COPY package.json .npmrc ./
 # legacy-peer-deps terbaca dari .npmrc yang ikut ter-copy, biarkan resolve peer bebas
 RUN npm install --no-audit --no-fund
 
+# CLI huggingface (`hf`): restore + backup objek sesi untuk Space ephemeral
+RUN (python3 -m pip install --break-system-packages huggingface_hub || \
+     python3 -m pip install huggingface_hub) && \
+    hf version || huggingface-cli version
+
 COPY . .
 
 RUN chmod -R 777 /app
