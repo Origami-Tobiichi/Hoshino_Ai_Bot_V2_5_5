@@ -4,6 +4,7 @@ FROM node:22-bookworm
 
 ENV NODE_ENV=development
 ENV TZ=Asia/Jakarta
+ENV PORT=8000
 
 WORKDIR /app
 

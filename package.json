@@ -87,7 +87,6 @@
     "pino": "^9.14.0",
     "play-dl": "^1.9.7",
     "playwright": "^1.63.0",
-    "puppeteer": "^25.3.0",
     "puppeteer-core": "^25.3.0",
     "qrcode": "^1.5.4",
     "qs": "^6.16.0",
