@@ -1,0 +1,147 @@
+const { createCanvas, loadImage } = require('@napi-rs/canvas')
+const axios = require('axios')
+const config = require('../../config')
+
+const pluginConfig = {
+    name: 'bratanime4',
+    alias: ['bratanimegura', 'bratgura', 'bratganime'],
+    category: 'sticker',
+    description: 'Membuat sticker anime chibi dengan teks brat style',
+    usage: '.bratanime4 <text>',
+    example: '.bratanime4 Besok cenin',
+    cooldown: 10,
+    energi: 1,
+    isEnabled: true
+}
+
+function getWrappedLines(ctx, text, maxWidth) {
+    const words = text.split(' ')
+    const lines = []
+    let currentLine = ''
+
+    for (const word of words) {
+        if (ctx.measureText(word).width > maxWidth) {
+            if (currentLine) { lines.push(currentLine); currentLine = '' }
+            let charLine = ''
+            for (const char of word) {
+                if (ctx.measureText(charLine + char).width > maxWidth) {
+                    lines.push(charLine)
+                    charLine = char
+                } else {
+                    charLine += char
+                }
+            }
+            if (charLine) currentLine = charLine
+        } else {
+            const test = currentLine ? `${currentLine} ${word}` : word
+            if (ctx.measureText(test).width > maxWidth && currentLine) {
+                lines.push(currentLine)
+                currentLine = word
+            } else {
+                currentLine = test
+            }
+        }
+    }
+    if (currentLine) lines.push(currentLine)
+    return lines
+}
+
+async function handler(m, { sock }) {
+    const text = m.args.join(' ')
+    if (!text) {
+        return m.reply(`🎀 *ʙʀᴀᴛᴀɴɪᴍᴇ4 sᴛɪᴄᴋᴇʀ*\n\n> Masukkan teks\n\n\`Contoh: ${m.prefix}bratanime4 Besok cenin\``)
+    }
+
+    m.react('🕕')
+
+    try {
+        // Semua link fallback gambar anime chibi tanpa teks
+        const bgUrls = [
+            'https://files.catbox.moe/m9teca.jpg',
+            'https://litter.catbox.moe/akn5gg.jpg',
+            'https://tmpfiles.org/dl/wvwAALkspgUu/file.jpg',
+            'https://gofile.io/d/s5gzIu',
+            'https://put.icu/s/l9b7k5sm.png',
+            'https://c.termai.cc/i132/s2x.png'
+        ]
+
+        let bgImage = null
+        for (const url of bgUrls) {
+            try {
+                const response = await axios.get(url, { responseType: 'arraybuffer', timeout: 8000 })
+                bgImage = await loadImage(Buffer.from(response.data))
+                break // Berhasil, hentikan loop
+            } catch (e) {
+                console.warn(`Bratanime4: Gagal load dari ${url}, mencoba link berikutnya...`)
+            }
+        }
+
+        if (!bgImage) throw new Error('Semua link gambar gagal dimuat')
+
+        const canvas = createCanvas(bgImage.width, bgImage.height)
+        const ctx = canvas.getContext('2d')
+
+        // Gambar background anime
+        ctx.drawImage(bgImage, 0, 0)
+
+        const W = bgImage.width
+        const H = bgImage.height
+
+        // Area teks di sisi kanan gambar (seperti "Besok cenin" di image)
+        // Karakter chibi ada di kiri, teks di kanan — geser lebih kanan agar tidak kena tangan
+        const textAreaX = Math.floor(W * 0.55)  // mulai 55% dari kiri (lebih kanan)
+        const textAreaY = Math.floor(H * 0.08)  // mulai 8% dari atas
+        const textAreaW = Math.floor(W * 0.42)  // lebar 42%
+        const textAreaH = Math.floor(H * 0.80)  // tinggi 80%
+
+        const padding = 10
+
+        // Cari font size terbesar yang muat di area teks
+        let fontSize = 80
+        let lines = []
+
+        while (fontSize >= 12) {
+            ctx.font = `bold ${fontSize}px Arial`
+            lines = getWrappedLines(ctx, text, textAreaW - padding * 2)
+            const lineHeight = fontSize * 1.2
+            const totalH = lines.length * lineHeight
+            if (totalH <= textAreaH - padding * 2) break
+            fontSize -= 2
+        }
+
+        const lineHeight = fontSize * 1.2
+        const totalTextH = lines.length * lineHeight
+
+        // Center vertikal dalam area teks
+        const startY = textAreaY + padding + (textAreaH - totalTextH) / 2 + fontSize
+        const centerX = textAreaX + (textAreaW / 2)
+
+        // Teks hitam, bold, tanpa outline (brat style)
+        ctx.font = `bold ${fontSize}px Arial`
+        ctx.fillStyle = '#000000'
+        ctx.textAlign = 'center'
+        ctx.textBaseline = 'alphabetic'
+
+        lines.forEach((line, i) => {
+            ctx.fillText(line, centerX, startY + i * lineHeight)
+        })
+
+        const buffer = canvas.toBuffer('image/jpeg')
+
+        await sock.sendImageAsSticker(m.chat, buffer, m, {
+            packname: config.sticker.packname,
+            author: config.sticker.author
+        })
+
+        m.react('✅')
+    } catch (err) {
+        console.error('Bratanime4 error:', err)
+        m.react('❌')
+        m.reply('❌ Gagal membuat sticker bratanime4, coba lagi nanti.\n> ' + err.message)
+    }
+}
+
+module.exports = {
+    config: pluginConfig,
+    handler
+}

@@ -1,0 +1,155 @@
+╭┈┈⬡「 🎤 *ʜᴏsʜɪɴᴏ ᴀɪ ʙᴏᴛ ᴠ2.5.5* 」
+┃ ✦ Update dari ᴠ2.4.1 → ᴠ2.5.5
+┃ ✦ 600+ file plugin diperbarui
+┃ ✦ Fitur baru, perbaikan, dan sistem aset baru
+╰┈┈┈┈┈┈┈┈⬡
+
+Haii, Producer-san~ 🌸 Ai bawa update gede nih! Cek yang baru ya 💖
+
+╭┈┈⬡「 🌾 *ᴀᴘᴀ ᴀᴊᴀ ʏᴀɴɢ ᴅɪ-ᴜᴘᴅᴀᴛᴇ* 」
+┃ - *[UPDATE]* versi script naik dari 2.4.1 ke 2.5.5
+┃ - *[UPDATE]* `hsnai` (Baileys fork) diperbarui: `messages-send.js` dan `message_builder.js`
+┃ - *[UPDATE]* ratusan plugin diperbarui (ai, canvas, download, clan, asupan, owner, group, game, dll)
+┃ - *[NEW]* loader aset baru `src/lib/assets.js`, menggantikan `assetManager.js`
+┃ - *[NEW]* store pesan pindah ke SQLite
+┃ - *[CLEAN]* semua database user, grup, saluran dan snippet sudah dikosongkan, jadi bot mulai dari awal
+╰┈┈┈┈┈┈┈┈⬡
+
+╭┈┈⬡「 ⚙️ *ᴄᴏʀᴇ & sɪsᴛᴇᴍ* 」
+┃ 📦 *Aset (URL)*
+┃ - Loader baru `src/lib/assets.js`, format key `images/hsnai`, `video/hsnai`, `fonts/Epep`
+┃ - Aset di-preload saat bot start (maks 25 detik, sisanya lanjut di background) biar thumbnail langsung siap
+┃ - Hasil download di-cache otomatis (memori + disk)
+┃ - URL hasil `.ganti-*` disimpan di `database/main/assetUrls.json`
+┃ - Gambar acak `.srt` sekarang dari `config.assets.shuffle` (daftar URL)
+┃
+┃ 🗄 *Store pesan*
+┃ - `makeInMemoryStore` (`baileys_store.json`) diganti SQLite berbasis `sql.js` (WASM, tanpa native build)
+┃ - File ada di `database/store/messages.db`, dipakai `getMessage` dan inspector `.crm`
+┃
+┃ 🧬 *hsnai (Baileys fork)*
+┃ - Poll bergambar (`pollCreationOptionImageMessage`) sekarang dikenali di `messages-send.js`
+┃ - `AIRich.addVideo()` terima `width` / `height` opsional, jadi rasio thumbnail ngikut ukuran video (mis. 16:9)
+┃
+┃ 🧩 *Library*
+┃ - `src/lib/storeSqlite.js` -> implementasi store pesan SQLite (WASM, tanpa native build)
+┃ - `src/lib/latexRender.js` -> render rumus LaTeX jadi PNG buat inline math di AIRich
+┃ - `src/lib/listWar.js` -> sistem list war untuk grup
+┃ - `src/lib/uploader.js` -> tambah `uploadToGithub` (pakai blok `config.github`), User-Agent jadi `hsnai-bot/1.0`
+┃ - `src/lib/underDevStore.js` -> fix crash `toLowerCase()` tiap pesan kalau `config.name` plugin berupa array
+┃ - `src/scraper/tiktok.js` -> helper resolve link TikTok (vt / vm / m / tt.site / `/t/xxx`)
+┃ - Link saluran default diganti ke saluran baru (`reconnect.js`, `exif.js`, `similarity.js`)
+┃
+┃ 🛠 *Install & dependency*
+┃ - `scripts/ensure-deps.js` gak maksa `TMPDIR=/home/container/tmp` lagi, jadi aman dijalankan di luar Pterodactyl
+┃ - Log `install.sh` jadi `hoshino_install.log`
+┃ - Dependency baru: `brat-canvas`, `fake-ff`
+┃ - Lisensi `package.json` ISC -> MIT (sesuai `LICENSE` dan README)
+┃
+┃ 🔧 *config.js*
+┃ - Website dan link grup WA diperbarui
+┃ - `autoTyping` default jadi `false`
+┃ - `geminiApiKey`, `fishaudio`, dan data `github` dikosongkan (isi sendiri)
+┃ - Rekening donasi / store jadi placeholder
+┃ - Key `config.assets` memakai format `'hsnai-v7'`, ditambah `shuffle` dan `categories`
+╰┈┈┈┈┈┈┈┈⬡
+
+╭┈┈⬡「 🍃 *ꜰɪx / ᴄʜᴀɴɢᴇ* 」
+┃ 🔁 *Diganti / dipindah*
+┃ - `.editimg` -> diganti jadi `.editimage` (alias `.editimg` dan `.imgedit` tetap bisa dipakai)
+┃ - `.fakeff` -> sekarang pakai package npm `fake-ff`, bukan API luar lagi
+┃ - `.chatgot` -> dipindah dari kategori tools ke kategori ai (alias `.cgot`, `.gotai`)
+┃ - `.botmode` versi admin grup dipisah jadi `.botmodegc` (mode bot per grup). `.botmode` untuk owner tetap ada
+┃ - `addlist`, `dellist`, `list` -> dipindah dari kategori store ke kategori group
+┃
+┃ 📥 *Download & search*
+┃ - `.tiktokdl` -> resolve link lebih lengkap lewat helper baru, dan parsing data video diperbaiki
+┃ - `.instagramdl` -> hasil divalidasi, banner / halaman error dari situs downloader gak ikut terkirim lagi
+┃ - `.ytmp3`, `.ytmp4`, `.play3`, `.ytplay` -> jalur download diperbarui (`.play3` output mp3 24k / 22.05kHz)
+┃ - `.pindl` -> support link pin, gambar, video, dan GIF
+┃ - `.lyrics` -> request otomatis diulang sampai 3x kalau gagal
+┃
+┃ 🎮 *GD*
+┃ - `.stalkgd`, `.levelgd`, `.searchgd` -> ada fallback ke server resmi GD kalau GDBrowser kena challenge Cloudflare
+┃
+┃ 🎨 *Tampilan & menu*
+┃ - `.menu` case 22 (Idol Stage) di-upgrade, kartu lebih besar dan fitur lebih banyak
+┃ - `.allmenu` -> V2 quoted bergaya stiker, V4 list kategori (tanpa carousel), V6 thumb proporsional + `buttonId`, V7 header video
+┃ - `.manggilhoshinoai` -> ditulis ulang: video bergaya typography via AIRich (upload Uguu dulu, Catbox cadangan, cache 30 menit)
+┃ - `.ping` -> dashboard Oshi no Ko, sekarang menampilkan pemakaian CPU
+┃ - `.script` -> tampilan diperbarui lewat AIRich
+┃ - `.owner`, `.toblack`, `.werewolf`, `.remini` -> diperbarui
+┃
+┃ 👑 *Owner*
+┃ - Semua `.ganti-*`, `.addmedia`, `.delmedia`, `.sendasset` -> ngikut loader aset baru
+┃ - `.backupsc` -> langsung backup script (aset sudah berupa URL)
+┃ - `.ganticode` -> alias baru `.gc`, pesan konflik command / alias lebih jelas
+┃ - `.reactchannel` -> pakai API react baru, default reaksi 😗 🤪 😎
+┃ - `.restart`, `.srt`, `.setreply`, `.ytnotify` -> diperbarui
+╰┈┈┈┈┈┈┈┈⬡
+
+╭┈┈⬡「 🍀 *ꜰɪᴛᴜʀ ʙᴀʀᴜ* 」
+┃ Berikut plugin yang di-TAMBAHKAN ✨
+╰┈┈┈┈┈┈┈┈⬡
+
+🎮 *ɢᴀᴍᴇ*
+- `.battleship` (alias `.bs`) -> Battleship 2 pemain dalam 1 perangkat
+- `.snake` (alias `.ular`) -> main Snake langsung di chat (rich response HTML)
+- `.dailyrpg` -> klaim hadiah harian RPG
+
+👥 *ɢʀᴜᴘ*
+- `.antiswgc` (alias `.antistatusgc`, `.antigroupstatus`) -> hapus otomatis status grup dari member non-admin. Bot harus jadi admin, owner dan admin grup aman
+- `.botmodegc` (alias `.setmodegc`, `.modegc`) -> atur mode bot per grup, khusus admin grup
+- `.onlyadmingc` (alias `.adminonlygc`, `.oagc`) -> atur onlyadmin per grup (terpisah dari onlyadmin global)
+
+🤖 *ᴀɪ*
+- `.editimage2` (alias `.editimg2`, `.nanobanana2`, `.editfoto2`) -> edit gambar pakai AI (NanoBanana)
+- `.sonu3` (alias `.aimusic`, `.aivoice`) -> AI music generator
+
+🎨 *ᴍᴀᴋᴇʀ*
+- `.meledak` -> gambar efek meledak dari foto / stiker
+- `.typogaleri` (alias `.tg`) -> video typography galeri 1:1 gaya editorial
+- `.typogaleri2` (alias `.tg2`) -> video typography galeri dari video / foto
+
+🔎 *sᴇᴀʀᴄʜ*
+- `.pinsrich` (alias `.pinrich`, `.pinz`, `.pinterestrich`, `.pinsr`) -> cari gambar Pinterest dalam grid yang bisa di-scroll
+- `.playcall` (alias `.telepon`, `.call`) -> putar musik YouTube lewat telepon (Masih Rusak)
+
+💎 *ᴘʀᴇᴍɪᴜᴍ*
+- `.netflixprem` (alias `.nfprem`, `.netflixpremium`) -> akses konten Netflix premium
+- `.amprem` (alias `.alightprem`, `.ampremium`) -> layanan Alight Motion premium
+
+🛠 *ᴛᴏᴏʟs*
+- `.swhd` -> balikin dokumen (video / gambar / sticker / audio) jadi media aslinya
+- `.claudeshare` (alias `.sharecl`, `.claudetxt`, `.cshare`) -> salin isi link share claude.ai jadi file txt
+- `.amfind` (alias `.amfinder`) -> cari preset Alight Motion dari link video
+- `.ffguest` (alias `.ffakun`, `.freefireguest`) -> buat akun guest Free Fire otomatis
+
+👑 *ᴏᴡɴᴇʀ*
+- `.addmetaai` (alias `.addai`, `.metaai`) -> tambah Meta AI ke grup
+- `.github` (alias `.gh`, `.git`, `.ghctl`) -> kontrol GitHub langsung dari WhatsApp (repo, file, commit, branch, issue)
+- `.crm` (alias `.insp`, `.adn`, `.relay`, `.lastchat`) -> CRM / relay inspector
+- `.ipleak` (alias `.myleak`) -> tampilkan informasi IP
+- `.ganti-hsnai-v10`, `v12`, `v13`, `v14`, `v16`, `v22` -> ganti gambar hsnai
+
+╭┈┈⬡「 🗑 *ᴅɪʜᴀᴘᴜs* 」
+┃ - Game: `quizbattle` dan `tictactoemp`
+┃ - Owner: `dmsg2`
+┃ - Tools: `ledcontroller`, `chatgot` (dipindah ke kategori ai)
+┃ - AI: `editimg` (diganti jadi `editimage`)
+┃ - File test: `test.js` dan `test2.js`
+╰┈┈┈┈┈┈┈┈⬡
+
+╭┈┈⬡「 🎀 *ɴᴏᴛᴇ ᴅᴀʀɪ ᴀɪ* 」
+┃ - Database sudah kosong, jadi owner, premium, dan data grup perlu diatur ulang
+┃ - Jalankan `npm install` lagi, ada dependency baru (`brat-canvas`, `fake-ff`)
+┃ - Node.js wajib >= 22, rekomendasi Node.js 24 LTS
+┃ - Isi sendiri di `config.js`: nomor pairing, nomor owner, `geminiApiKey` (untuk `.autoai`), `fishaudio` (untuk `.hoshinoai`), token Vercel dan GitHub
+┃ - `.github` butuh blok `config.github` (`token`, `owner`, `repo`, `branch`, `folder`)
+┃ - URL asset diisi di `config.assets`. Key yang URL-nya kosong akan dilewati (thumbnail gak muncul)
+┃ - `hsnai-promote` dan `hsnai-demote` (di `config.assets.images`) wajib terisi, karena promote / demote grup kirim gambar lewat URL
+┃ - Folder `database/store` dibuat otomatis saat pertama jalan, hapus kalau mau reset store pesan
+┃ - `.playcall` masih rusak, nunggu Ai benerin ya~ 🥺
+╰┈┈┈┈┈┈┈┈⬡
+
+Makasih udah pakai Ai, Producer-san! Jangan lupa bantu Ai terus bersinar ya~ 🌸💖✨

@@ -1,0 +1,32 @@
+node_modules/
+package-lock.json.npm/
+
+# Runtime / user data (do not push)
+database/main/
+database/cpanel/
+database/*.json
+data/*.json
+
+# WhatsApp sessions & credentials
+sessions/
+*.session
+creds.json
+auth_info/
+jadibot/
+
+# Temporary & local files
+*.log
+logs/
+tmp/
+temp/
+.cache/
+*.bak
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# trained data -> file too big
+eng.traineddata
+ind.traineddata

@@ -1,0 +1,217 @@
+{
+  "name": "FaJaruzumaki",
+  "totalDurationMs": 18699,
+  "photoCount": 3,
+  "segments": [
+    {
+      "start": 0,
+      "end": 2065,
+      "photoIndex": 0
+    },
+    {
+      "start": 2050,
+      "end": 2532,
+      "photoIndex": 0
+    },
+    {
+      "start": 2516,
+      "end": 2799,
+      "photoIndex": 0
+    },
+    {
+      "start": 2783,
+      "end": 3265,
+      "photoIndex": 0
+    },
+    {
+      "start": 3250,
+      "end": 3515,
+      "photoIndex": 0
+    },
+    {
+      "start": 3500,
+      "end": 3965,
+      "photoIndex": 0
+    },
+    {
+      "start": 3950,
+      "end": 4432,
+      "photoIndex": 0
+    },
+    {
+      "start": 4416,
+      "end": 4699,
+      "photoIndex": 0
+    },
+    {
+      "start": 4683,
+      "end": 5182,
+      "photoIndex": 0
+    },
+    {
+      "start": 5166,
+      "end": 5465,
+      "photoIndex": 0
+    },
+    {
+      "start": 5450,
+      "end": 5915,
+      "photoIndex": 0
+    },
+    {
+      "start": 5900,
+      "end": 6382,
+      "photoIndex": 0
+    },
+    {
+      "start": 6366,
+      "end": 6649,
+      "photoIndex": 0
+    },
+    {
+      "start": 6633,
+      "end": 7115,
+      "photoIndex": 0
+    },
+    {
+      "start": 7100,
+      "end": 7365,
+      "photoIndex": 0
+    },
+    {
+      "start": 7350,
+      "end": 7849,
+      "photoIndex": 0
+    },
+    {
+      "start": 7833,
+      "end": 9715,
+      "photoIndex": 0
+    },
+    {
+      "start": 9700,
+      "end": 10199,
+      "photoIndex": 1
+    },
+    {
+      "start": 9700,
+      "end": 10915,
+      "photoIndex": 0
+    },
+    {
+      "start": 10183,
+      "end": 10465,
+      "photoIndex": 1
+    },
+    {
+      "start": 10450,
+      "end": 10915,
+      "photoIndex": 1
+    },
+    {
+      "start": 10900,
+      "end": 11199,
+      "photoIndex": 1
+    },
+    {
+      "start": 11183,
+      "end": 11649,
+      "photoIndex": 1
+    },
+    {
+      "start": 11633,
+      "end": 12115,
+      "photoIndex": 1
+    },
+    {
+      "start": 11633,
+      "end": 12382,
+      "photoIndex": 1
+    },
+    {
+      "start": 12100,
+      "end": 12382,
+      "photoIndex": 1
+    },
+    {
+      "start": 12366,
+      "end": 12832,
+      "photoIndex": 1
+    },
+    {
+      "start": 12816,
+      "end": 13099,
+      "photoIndex": 1
+    },
+    {
+      "start": 13083,
+      "end": 13565,
+      "photoIndex": 1
+    },
+    {
+      "start": 13083,
+      "end": 13565,
+      "photoIndex": 2
+    },
+    {
+      "start": 13550,
+      "end": 14032,
+      "photoIndex": 2
+    },
+    {
+      "start": 14016,
+      "end": 14299,
+      "photoIndex": 2
+    },
+    {
+      "start": 14283,
+      "end": 14749,
+      "photoIndex": 2
+    },
+    {
+      "start": 14733,
+      "end": 15032,
+      "photoIndex": 2
+    },
+    {
+      "start": 15016,
+      "end": 15515,
+      "photoIndex": 2
+    },
+    {
+      "start": 15016,
+      "end": 15515,
+      "photoIndex": 2
+    },
+    {
+      "start": 15500,
+      "end": 15949,
+      "photoIndex": 2
+    },
+    {
+      "start": 15933,
+      "end": 16199,
+      "photoIndex": 2
+    },
+    {
+      "start": 16183,
+      "end": 16665,
+      "photoIndex": 2
+    },
+    {
+      "start": 16650,
+      "end": 16915,
+      "photoIndex": 2
+    },
+    {
+      "start": 16900,
+      "end": 17415,
+      "photoIndex": 2
+    }
+  ],
+  "outro": {
+    "start": 17083,
+    "end": 18699,
+    "type": "gradient_wipe"
+  }
+}
