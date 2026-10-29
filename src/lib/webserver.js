@@ -93,6 +93,15 @@ function isConnectedTrue() {
   return !!(st.isConnected && st.isReady);
 }
 
+async function waitSocketReady(sock, ms = 30000) {
+  const start = Date.now();
+  while (Date.now() - start < ms) {
+    if (sock.socket && sock.socket.readyState === 1) return sock;
+    await new Promise((r) => setTimeout(r, 500));
+  }
+  return null;
+}
+
 async function requestPairingCode(number) {
   const st = getConnectionState();
   const sock = st.sock;
@@ -100,23 +109,19 @@ async function requestPairingCode(number) {
     throw new Error("Sistem belum siap, tunggu beberapa detik lalu coba lagi");
   }
   if (sock.authState?.creds?.registered) {
-    const e = new Error(
-      "Bot sudah login. Klik tombol ⏏ Logout & Ganti Nomor dulu untuk merubah nomor bot ya.",
-    );
+    const e = new Error("Bot sudah login. Klik tombol ⏏ Logout & Ganti Nomor dulu untuk merubah nomor bot ya.");
     e.flow = "sudah-login";
     throw e;
   }
-  let lastErr = null;
-  for (let i = 0; i < 3; i++) {
-    try {
-      // kasih waktu socket buat settle sebelum minta kode
-      await new Promise((r) => setTimeout(r, i === 0 ? 2000 : 4000));
-      return await sock.requestPairingCode(number, PAIR_KEY);
-    } catch (e) {
-      lastErr = e;
-    }
+  const ready = await waitSocketReady(sock, 30000);
+  if (!ready) {
+    throw new Error("Socket WhatsApp belum siap, coba lagi dalam beberapa detik");
   }
-  throw lastErr || new Error("Gagal meminta kode pairing");
+  try {
+    return await sock.requestPairingCode(number, PAIR_KEY);
+  } catch (e) {
+    throw e;
+  }
 }
 
 async function handleApi(req, res, pathname) {
