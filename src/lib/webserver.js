@@ -22,6 +22,18 @@ const CORS_HEADERS = {
   "Access-Control-Max-Age": "86400",
 };
 const pairRate = new Map();
+const PAIR_WINDOW_MS = 8000;
+
+// Di belakang proxy (Koyeb), req.socket.remoteAddress bernilai satu untuk semua
+// tanggal klien — bikin "terlalu sering" muncul padahal klik pertama. Ambil IP
+// asli dari header X-Forwarded-For / X-Real-IP.
+function clientIP(req) {
+  const xf = String(req.headers?.["x-forwarded-for"] || "");
+  if (xf) return xf.split(",")[0].trim();
+  const xr = String(req.headers?.["x-real-ip"] || "");
+  if (xr) return xr.trim();
+  return (typeof req.socket?.remoteAddress === "string" ? req.socket.remoteAddress : null) || "?";
+}
 
 function humanizeUptime(ms) {
   if (!ms) return "—";
@@ -115,13 +127,17 @@ async function handleApi(req, res, pathname) {
   }
 
   if (req.method === "POST" && pathname === "/api/pair") {
-    const ip = req.socket.remoteAddress || "?";
+    const ip = clientIP(req);
     const now = Date.now();
     const prev = pairRate.get(ip) || 0;
-    if (now - prev < 15000) {
-      return sendJson(res, 429, { ok: false, error: "Terlalu sering, tunggu 15 detik ya~" });
+    if (now - prev < PAIR_WINDOW_MS) {
+      const sisa = Math.ceil((PAIR_WINDOW_MS - (now - prev)) / 1000);
+      return sendJson(res, 429, { ok: false, error: `Jeda ${Math.max(sisa, 1)} detik lalu klik Lagi ya~` });
     }
     pairRate.set(ip, now);
+    if (pairRate.size > 500) {
+      for (const [k, t] of pairRate) if (now - t > 60000) pairRate.delete(k);
+    }
 
     const body = await readJsonBody(req);
     const number = String(body.number || "").replace(/[^0-9]/g, "");
