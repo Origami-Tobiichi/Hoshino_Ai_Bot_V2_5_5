@@ -1155,7 +1155,11 @@ async function logout() {
     );
 
     if (connectionState.sock) {
-      await connectionState.sock.logout();
+      try {
+        await connectionState.sock.logout();
+      } catch (e) {
+        colors.logger.warn("koneksi", `sock.logout gagal: ${e.message}`);
+      }
     }
 
     if (fs.existsSync(sessionPath)) {

@@ -100,7 +100,11 @@ async function requestPairingCode(number) {
     throw new Error("Sistem belum siap, tunggu beberapa detik lalu coba lagi");
   }
   if (sock.authState?.creds?.registered) {
-    throw new Error("Bot sudah login. Tekan tombol Logout dulu untuk ganti nomor");
+    const e = new Error(
+      "Bot sudah login. Klik tombol ⏏ Logout & Ganti Nomor dulu untuk merubah nomor bot ya.",
+    );
+    e.flow = "sudah-login";
+    throw e;
   }
   let lastErr = null;
   for (let i = 0; i < 3; i++) {
@@ -160,7 +164,7 @@ async function handleApi(req, res, pathname) {
     const body = await readJsonBody(req);
     const number = String(body.number || "").replace(/[^0-9]/g, "");
     if (number.length < 10 || number.length > 15) {
-      return sendJson(res, 400, {
+      return sendJson(res, 200, {
         ok: false,
         error: "Nomor tidak valid. Format internasional tanpa +, contoh: 6281234567890",
       });
@@ -171,7 +175,7 @@ async function handleApi(req, res, pathname) {
       colors.logger.info("web", `kode pairing diminta via web untuk ${number}`);
       return sendJson(res, 200, { ok: true, code: formatted });
     } catch (e) {
-      return sendJson(res, 502, { ok: false, error: e.message });
+      return sendJson(res, 200, { ok: false, error: e.message });
     }
   }
 
