@@ -118,7 +118,10 @@ async function requestPairingCode(number) {
     throw new Error("Socket WhatsApp belum siap, coba lagi dalam beberapa detik");
   }
   try {
-    return await sock.requestPairingCode(number, PAIR_KEY);
+    const timeout = new Promise((_, rej) =>
+      setTimeout(() => rej(new Error("Kode pairing timeout, coba lagi")), 15000),
+    );
+    return await Promise.race([sock.requestPairingCode(number, PAIR_KEY), timeout]);
   } catch (e) {
     throw e;
   }
