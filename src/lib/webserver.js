@@ -139,13 +139,17 @@ async function handleApi(req, res, pathname) {
     const ip = clientIP(req);
     const now = Date.now();
     const prev = pairRate.get(ip) || 0;
-    if (now - prev < PAIR_WINDOW_MS) {
-      const sisa = Math.ceil((PAIR_WINDOW_MS - (now - prev)) / 1000);
-      colors.logger.warn("web", `pair 429 dari ${ip} umur ${now - prev}ms`);
+    const age = now - prev;
+    // Replay duplikat (edge proxy mengirim ulang request dalam <200ms) boleh
+    // lewat supaya klik pertama user tidak pernah kena limit; yang dibatasi
+    // adalah klik manusia yang berulang cepat (>200ms tapi < jendela 8 detik).
+    if (age > 200 && age < PAIR_WINDOW_MS) {
+      const sisa = Math.ceil((PAIR_WINDOW_MS - age) / 1000);
+      colors.logger.warn("web", `pair 429 dari ${ip} umur ${age}ms`);
       return sendJson(res, 429, {
         ok: false,
         error: `Jeda ${Math.max(sisa, 1)} detik lalu klik Lagi ya~`,
-        dbg: { age: now - prev, key: String(ip).slice(-12) },
+        dbg: { age, key: String(ip).slice(-12) },
       });
     }
     pairRate.set(ip, now);
