@@ -126,13 +126,27 @@ async function handleApi(req, res, pathname) {
     return sendJson(res, 200, statusPayload());
   }
 
+  if (req.method === "GET" && pathname === "/api/_hdr") {
+    const hdrs = { ...req.headers };
+    delete hdrs.authorization;
+    return sendJson(res, 200, {
+      remote: req.socket?.remoteAddress || null,
+      headers: hdrs,
+    });
+  }
+
   if (req.method === "POST" && pathname === "/api/pair") {
     const ip = clientIP(req);
     const now = Date.now();
     const prev = pairRate.get(ip) || 0;
     if (now - prev < PAIR_WINDOW_MS) {
       const sisa = Math.ceil((PAIR_WINDOW_MS - (now - prev)) / 1000);
-      return sendJson(res, 429, { ok: false, error: `Jeda ${Math.max(sisa, 1)} detik lalu klik Lagi ya~` });
+      colors.logger.warn("web", `pair 429 dari ${ip} umur ${now - prev}ms`);
+      return sendJson(res, 429, {
+        ok: false,
+        error: `Jeda ${Math.max(sisa, 1)} detik lalu klik Lagi ya~`,
+        dbg: { age: now - prev, key: String(ip).slice(-12) },
+      });
     }
     pairRate.set(ip, now);
     if (pairRate.size > 500) {
