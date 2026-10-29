@@ -8,7 +8,9 @@ const {
   getConnectionState,
   logout,
   getUptime,
+  startConnection,
 } = require("../connection");
+const persist = require("../../scripts/hf-session-sync.js");
 
 const PAIR_KEY = "HSNAITMS";
 
@@ -142,13 +144,33 @@ async function handleApi(req, res, pathname) {
   if (req.method === "POST" && pathname === "/api/logout") {
     const ok = await logout();
     if (ok) {
-      colors.logger.info("web", "logout via web diminta, proses akan direstart");
-      setTimeout(() => process.exit(0), 1000);
+      colors.logger.info("web", "logout via web diminta — menghapus sesi & menyiapkan sesi baru");
+      pickRemainedSession();
     }
-    return sendJson(res, ok ? 200 : 500, { ok });
+    return sendJson(res, ok ? 200 : 500, { ok: true });
   }
-
   return sendJson(res, 404, { ok: false, error: "endpoint tidak ditemukan" });
+}
+
+// Setelah logout: bersihkan backup sesi lama (biar tidak dipulihkan lagi saat
+// container restart), lalu minta sesi WhatsApp BARU tanpa matikan proses.
+// Dengan begini user cukup isi nomor baru di panel untuk ganti nomor bot.
+async function pickRemainedSession() {
+  try {
+    if (persist.ready()) {
+      colors.logger.info("web", "menghapus backup sesi lama di penyimpanan awan...");
+      await persist.wipeRemote();
+      colors.logger.success("web", "backup sesi lama dihapus");
+    }
+  } catch (e) {
+    colors.logger.warn("web", "hapus backup gagal (dilanjutkan): " + e.message);
+  }
+  try {
+    await startConnection({ skipAutoPair: true });
+    colors.logger.success("web", "sesi baru siap — isi nomor baru di panel untuk pairing");
+  } catch (e) {
+    colors.logger.error("web", "gagal eksekusi sesi baru: " + e.message);
+  }
 }
 
 function sendJson(res, code, obj) {

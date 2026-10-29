@@ -123,6 +123,59 @@ function save(reason) {
   });
 }
 
+// Hapus storage.tar.gz lama di penyimpanan awan.
+// Dipakai saat user logout dari panel: tanpa ini, restore() di boot berikutnya
+// akan memulihkan balik sesi nomor lama — logout jadi percuma.
+// Backend GitHub dihapus lewat git; backend HF dihapus lewat CLI hf.
+function wipeRemote() {
+  if (!ready() || uploading) return Promise.resolve(false);
+  uploading = true;
+  return new Promise((resolve) => {
+    setImmediate(() => {
+      let done = false;
+      const finish = (v) => {
+        if (!done) {
+          done = true;
+          uploading = false;
+          log(v ? "backup lama dihapus dari awan" : "tidak ada backup lama / hapus gagal");
+          resolve(!!v);
+        }
+      };
+      if (GIT_SYNC_URL) {
+        try {
+          fs.rmSync(GIT_DIR, { recursive: true, force: true });
+          execFileSync("git", ["clone", "--depth", "1", GIT_SYNC_URL, GIT_DIR], { stdio: "ignore" });
+          const marker = path.join(GIT_DIR, "storage.tar.gz");
+          if (!fs.existsSync(marker)) return finish(true);
+          fs.rmSync(marker, { force: true });
+          spawnSync("git", ["-C", GIT_DIR, "add", "-A"], { stdio: "ignore" });
+          const c = spawnSync("git", ["-C", GIT_DIR, "-c", "user.name=persist", "-c", "user.email=persist@bot", "commit", "-m", "logout: hapus backup sesi lama"], { stdio: "ignore" });
+          const p = spawnSync("git", ["-C", GIT_DIR, "push", "-f", "origin", "HEAD"], { stdio: "pipe", encoding: "utf8" });
+          finish(p.status === 0);
+        } catch (e) {
+          log("hapus backup GitHub gagal: " + (e && e.message ? e.message : e));
+          finish(false);
+        }
+        return;
+      }
+      if (TOKEN && DATASET) {
+        try {
+          execFile(
+            "hf",
+            ["delete", DATASET, "storage.tar.gz", "--repo-type", "dataset"],
+            { env: process.env },
+            (err) => finish(!err),
+          );
+        } catch {
+          finish(false);
+        }
+        return;
+      }
+      finish(false);
+    });
+  });
+}
+
 function start(reason) {
   if (!ready()) return false;
   restore();
@@ -133,7 +186,7 @@ function start(reason) {
   return true;
 }
 
-module.exports = { ready, restore, save, start };
+module.exports = { ready, restore, save, wipeRemote, start };
 
 if (require.main === module) {
   start("cli");

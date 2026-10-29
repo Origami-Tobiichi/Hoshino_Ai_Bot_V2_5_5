@@ -272,7 +272,7 @@ extendSocket(sock);
     colors.logger.warn("tostickerpack", `gagal attach album listener: ${e.message}`);
   }
 
-  if (usePairingCode && !sock.authState.creds.registered) {
+  if (usePairingCode && !sock.authState.creds.registered && !options.skipAutoPair) {
     let phoneNumber = pairingNumber;
 
     if (!phoneNumber || phoneNumber === "") {
