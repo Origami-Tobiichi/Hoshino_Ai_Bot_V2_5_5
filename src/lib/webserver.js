@@ -113,7 +113,7 @@ async function requestPairingCode(number) {
     e.flow = "sudah-login";
     throw e;
   }
-  const ready = await waitSocketReady(sock, 30000);
+  const ready = await waitSocketReady(sock, 8000);
   if (!ready) {
     throw new Error("Socket WhatsApp belum siap, coba lagi dalam beberapa detik");
   }
